@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.0.0/uicons-regular-straight/css/uicons-regular-straight.css'>
+  <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
+  <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.0.0/uicons-solid-rounded/css/uicons-solid-rounded.css'>
+  <title>Earthquake Prediction</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: #333;
+      color: white;
+      padding: 1em;
+      text-align: center;
+    }
+
+    main {
+      display: flex;
+      flex: 1;
+    }
+
+    nav {
+      background-color: #444;
+      color: white;
+      padding: 0.5em;
+      text-align: center;
+      flex: 0 0 150px; 
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 0.5em 1em;
+      margin: 0.5em 0;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+      display: block;
+    }
+
+    nav a:hover {
+      background-color: #555;
+    }
+
+    section {
+      flex: 1;
+      padding: 1em;
+      margin-left: 1em;
+    }
+
+    #map {
+      width: 70%;
+      height: 400px;
+      margin: 0 auto;
+      margin-bottom: 1em;
+    }
+
+    .info {
+      margin-bottom: 1em;
+    }
+
+    footer {
+      background-color: #333;
+      color: white;
+      padding: 1em;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Earthquake Prediction</h1>
+  </header>
+
+  <main>
+    <nav>
+      <a href="#"><i class="fi fi-sr-stats"></i> Data</a>
+      <a href="#"><i class="fi fi-rr-info"></i> About</a>
+      <a href="#"><i class="fi fi-rs-form"></i> Contact</a>
+    </nav>
+
+    <section>
+      <div class="info">
+        <h2>Prediction Results</h2>
+        <p id="predictionResult">The probability of at least one earthquake
+            with magnitude M5+ within 100 km
+            in the next 7 days is 0.3%</p>
+      </div>
+
+      <div id="map"></div>
+
+    </section>
+  </main>
+
+  <footer>
+    &copy; 2023 Earthquake Prediction App
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      var map = L.map('map').setView([43.2551, 76.9126], 12); 
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      var heatMapData = [
+      [43.2051, 76.9126, 10], 
+        [43.150, 76.91, 3.8],
+        [43.150, 76.92, 3.7],
+        [43.150, 76.91, 3.6],
+        [43.155, 76.92, 3.5],
+        [43.155, 77.01, 5],
+        [43.150, 76.95, 4.5],
+        [43.157, 76.98, 5],
+        [43.130, 76.92, 3.9],
+        [43.150, 76.95, 4],
+        [43.155, 76.935, 3.2],
+        [43.155, 76.925, 4.8],
+        [43.150, 76.945, 3.5],
+        [43.155, 76.955, 4.2],
+        [43.165, 76.965, 3.7],
+        [43.170, 76.975, 4.5],
+        [43.160, 76.985, 3.8],
+        [43.150, 77.005, 5],
+        [43.155, 77.015, 4.7]
+
+      ];
+
+      var heatLayer = L.heatLayer(heatMapData, { radius: 100 }).addTo(map);
+
+      var earthquakeMarker = L.marker([0, 0]).addTo(map);
+
+      fetch('https://api.example.com/earthquake-prediction')
+        .then(response => response.json())
+        .then(data => {
+
+          document.getElementById('predictionResult').textContent = data.prediction;
+
+          earthquakeMarker.setLatLng([data.latitude, data.longitude]);
+
+          heatLayer.setLatLngs([[data.latitude, data.longitude, 
+          1]]); 
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
+    });
+  </script>
+
+</body>
+</html>
